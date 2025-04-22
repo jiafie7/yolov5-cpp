@@ -1,0 +1,52 @@
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# CMake
+cmake-build-debug/
+cmake-build-release/
+
+# Distribution / packaging
+env/
+build/
+
+
+# Neural Network weights 
+*.weights
+*.pt
+*.pb
+*.engine
+*.mlmodel
+*.mlpackage
+*.torchscript
+*.tflite
+*.h5
+
+# Datasets
+coco/
+coco128/
+VOC/
+
+# Repo-specific GitIgnore 
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tif
+*.tiff
+*.heic
+*.JPG
+*.JPEG
+*.PNG
+*.BMP
+*.TIF
+*.TIFF
+*.HEIC
+*.mp4
+*.mov
+*.MOV
+*.avi
+*.data
+*.json
+*.cfg
