@@ -60,7 +60,7 @@ namespace detector
     double m_inference_time;
 
     // font setup
-    const float FONT_SCALE = 0.72;
+    const float FONT_SCALE = 0.75;
     const int FONT_FACE = cv::FONT_HERSHEY_SIMPLEX;
     const int THICKNESS = 2;
 

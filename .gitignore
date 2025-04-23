@@ -15,6 +15,7 @@ build/
 # Neural Network weights 
 *.weights
 *.pt
+*.onnx
 *.pb
 *.engine
 *.mlmodel

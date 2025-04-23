@@ -158,7 +158,7 @@ cv::Mat YOLODetector::postProcess(cv::Mat& input_image, const std::vector<cv::Ma
     label = m_class_list[class_ids[idx]] + ":" + label;
 
     // draw the class label
-    // todo ...
+    drawLabel(input_image, label, left, top);
   }
     
   return input_image;
@@ -167,6 +167,21 @@ cv::Mat YOLODetector::postProcess(cv::Mat& input_image, const std::vector<cv::Ma
 // Draw labels on the image
 void YOLODetector::drawLabel(cv::Mat& input_image, const std::string& label, int left, int top)
 { 
+  // Place the label on top of the bounding box
+  int baseLine;
+  cv::Size label_size = cv::getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS, &baseLine);
+  top = std::max(top, label_size.height);
+
+  // Top left corner
+  cv::Point tlc = cv::Point(left, top);
+  // Bottom right corner
+  cv::Point brc = cv::Point(left + label_size.width, top + label_size.height + baseLine);
+
+  // Draw black rectangle
+  cv::rectangle(input_image, tlc, brc, BLACK, cv::FILLED);
+
+  // Place a label on the black rectangle
+  cv::putText(input_image, label, cv::Point(left, top + label_size.height), FONT_FACE, FONT_SCALE, MINT_GREEN, THICKNESS);
 }
 
 // Single image object detection
@@ -177,6 +192,10 @@ cv::Mat YOLODetector::detect(const cv::Mat& image)
   std::vector<cv::Mat> detections = preProcess(frame);
 
   cv::Mat result = postProcess(frame, detections);
+
+  // Add inference time label
+  std::string label = cv::format("Inference time : %.2f ms", m_inference_time);
+  cv::putText(result, label, cv::Point(20, 40), FONT_FACE, FONT_SCALE, ORANGE, THICKNESS);
 
   return result;
 }

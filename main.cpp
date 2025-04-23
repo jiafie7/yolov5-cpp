@@ -42,7 +42,17 @@ int main(int argc, char* argv[])
         throw std::runtime_error("Unable to load image: " + image_path);
       }
 
-      detector.detect(frame);
+      cv::Mat result = detector.detect(frame);
+
+      // show result
+      cv::imshow("Output", result);
+      std::cout << "Press any key to close the window..." << std::endl;
+      cv::waitKey(0);
+
+      // save result
+      std::string output_path = image_path.substr(0, image_path.find_last_of('.')) + "_detected.jpg";
+      cv::imwrite(output_path, result);
+      std::cout << "Results saved to: " << output_path << std::endl;
     }
     return 0;
   }
