@@ -9,36 +9,36 @@ namespace detector
   class YOLODetector 
   {
   public:
+    YOLODetector(
+      const std::string& model_path,
+      const std::string& classes_path,
+      float input_width = 640.0,
+      float input_height = 640.0,
+      float confidence_threshold = 0.45,
+      float score_threshold = 0.5,
+      float nms_threshold = 0.45
+    )
+    virtual ~YOLODetector() = default;
+
+    double getInferenceTime() const;
+    float getInputWidth() const;
+    float getInputHeight() const;
+
+    // Single image object detection
+    cv::Mat detect(const cv::Mat& image);
       
   private:
-    /**
-     * @brief Load category names from file
-     * @param classes_path Category name file path
-     */
+    
+    // Load category names from file
     void loadClasses(const std::string& classes_path);
 
-    /**
-     * @brief Image preprocessing
-     * @param input_image Input images
-     * @return Network outputs
-     */
+    // Image preprocessing
     std::vector<cv::Mat> preProcess(const cv::Mat& input_image);
 
-    /**
-     * @brief Post-processing test results
-     * @param input_image Input images
-     * @param outputs Network outputs
-     * @return Image with detection results
-     */
+    // Post-processing test results
     cv::Mat postProcess(cv::Mat& input_image, const std::vector<cv::Mat>& outputs);
 
-    /**
-     * @brief Draw labels on the image
-     * @param input_image Input images
-     * @param label Label texts
-     * @param left Left border
-     * @param top Top border
-     */
+    // Draw labels on the image
     void drawLabel(cv::Mat& input_image, const std::string& label, int left, int top);
 
   priavte:
@@ -59,7 +59,7 @@ namespace detector
     double m_inference_time;
 
     // font setup
-    const float FONT_SCALE = 1;
+    const float FONT_SCALE = 0.75;
     const int FONT_FACE = cv::FONT_HERSHEY_SIMPLEX;
     const int THICKNESS = 2;
 
