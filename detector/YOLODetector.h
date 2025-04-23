@@ -27,7 +27,11 @@ namespace detector
 
     // Single image object detection
     cv::Mat detect(const cv::Mat& image);
-      
+
+    // Batch process all images in a directory
+    int detectBatch(const std::string& input_dir, const std::string& output_dir, bool show_progress = true);
+    int detectBatch(const std::vector<std::string>& image_paths, const std::string& output_dir, bool show_progress = true);
+
   private:
     
     // Load category names from file
@@ -41,6 +45,9 @@ namespace detector
 
     // Draw labels on the image
     void drawLabel(cv::Mat& input_image, const std::string& label, int left, int top);
+
+    // Get all image files in a directory
+    std::vector<std::string> getImageFiles(const std::string& directory)
 
   private:
     // model parameters

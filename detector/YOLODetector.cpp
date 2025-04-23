@@ -1,6 +1,7 @@
 #include "YOLODetector.h"
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 using namespace detector;
 
@@ -199,3 +200,106 @@ cv::Mat YOLODetector::detect(const cv::Mat& image)
 
   return result;
 }
+
+// Get all image files in a directory
+std::vector<std::string> YOLODetector::getImageFiles(const std::string& directory) 
+{
+  std::vector<std::string> image_files;
+    
+  for (const auto& entry : std::filesystem::directory_iterator(directory)) 
+  {
+    if (entry.is_regular_file()) 
+    {
+      // Only handles files
+      std::string extension = entry.path().extension().string();
+      
+      // The suffix names are unified into lowercase letters for comparison
+      std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+            
+      // Handles common image formats
+      if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || 
+        extension == ".bmp" || extension == ".tiff" || extension == ".tif") 
+      {
+        image_files.push_back(entry.path().string());
+      }
+    }
+  }
+    
+  return image_files;
+}
+
+// Batch process all images in a directory
+int YOLODetector::detectBatch(const std::string& input_dir, const std::string& output_dir, bool show_progress)
+{
+  std::vector<std::string> image_files = getImageFiles(input_dir);
+    
+  // Recursion call the overloaded method
+  return detectBatch(image_files, output_dir, show_progress);
+}
+
+int YOLODetector::detectBatch(const std::vector<std::string>& image_paths, const std::string& output_dir, bool show_progress)
+{
+  if (!std::filesystem::exists(output_dir)) 
+  {
+    std::filesystem::create_directory(output_dir);
+  }  
+
+  int processed_count = 0;
+  int total_files = image_paths.size();
+
+  if (show_progress) 
+  {
+    std::cout << "Start processing " << total_files << " image files..." << std::endl;
+  }
+
+  for (size_t i = 0; i < total_files; ++ i) 
+  {
+    const std::string& image_path = image_paths[i];
+        
+    try 
+    {
+      // Load image
+      cv::Mat frame = cv::imread(image_path);
+      if (frame.empty()) 
+      {
+        if (show_progress) 
+        {
+          std::cerr << "Error: unable to load image: " << image_path << std::endl;
+        }
+        continue;
+      }
+            
+      // Perform each single image detection
+      cv::Mat result = detect(frame);
+            
+      // Get filename (remove path)
+      std::filesystem::path path(image_path);
+      std::string filename = path.filename().string();
+            
+      std::string output_path = output_dir + "/" + filename;
+            
+      // Save detection results
+      cv::imwrite(output_path, result);
+            
+      ++ processed_count;
+            
+      // Show progress
+      if (show_progress) 
+      {
+        std::cout << "[" << i + 1 << "/" << total_files << "] have processed: " << filename << ", inference time: " << m_inference_time << " ms" << std::endl;
+      }
+    } 
+    catch (const std::exception& e) 
+    {
+      std::cerr << "Handle image " << image_path << " error: " << e.what() << std::endl;
+    }
+  }
+  
+  if (show_progress) 
+  {
+    std::cout << "Batch processing completed! Processed successfully " << processed_count << "/" << total_files << " images" << std::endl;
+  }
+    
+  return processed_count;
+}
+
