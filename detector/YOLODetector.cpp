@@ -303,6 +303,7 @@ int YOLODetector::detectBatch(const std::vector<std::string>& image_paths, const
   return processed_count;
 }
 
+// Process video files
 int YOLODetector::detectVideo(const std::string& video_path, const std::string& output_path, bool show_preview)
 {
   // Open video file
@@ -321,7 +322,7 @@ int YOLODetector::detectVideo(const std::string& video_path, const std::string& 
   // Create video writer
   cv::VideoWriter video_writer(
     output_path,
-    cv::VideoWriter::fourcc('M', 'P', '4', 'V'),
+    cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
     fps,
     cv::Size(frame_width, frame_height)
   );
@@ -377,6 +378,111 @@ int YOLODetector::detectVideo(const std::string& video_path, const std::string& 
   }
     
   std::cout << "Video processing completed, processed " << frame_count << " frames，results saved to " << output_path << std::endl;
+    
+  return frame_count;
+}
+
+// Real-time camera detection
+int YOLODetector::detectCamera(int camera_id, const std::string& output_path) 
+{
+  // Open camera
+  cv::VideoCapture cap(camera_id);
+  if (!cap.isOpened()) 
+  {
+    throw std::runtime_error("Unable open camera，ID: " + std::to_string(camera_id));
+  }
+    
+  // Get video attributes
+  int frame_width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+  int frame_height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+  double fps = 30.0;
+
+  // Create video writer
+  cv::VideoWriter video_writer;
+  if (!output_path.empty()) 
+  {
+    video_writer.open(
+      output_path,
+      cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
+      fps,
+      cv::Size(frame_width, frame_height)
+    );
+        
+    if (!video_writer.isOpened()) 
+    {
+      throw std::runtime_error("Unable create output video file: " + output_path);
+    }
+  }
+
+  cv::Mat frame;
+  int frame_count = 0;
+  double total_time = 0.0;
+    
+  std::cout << "Start camera real-time detection，press ESC to quit" << std::endl;
+
+  while (true) 
+  {
+    // read each frame
+    if (!cap.read(frame)) 
+    {
+      std::cerr << "Unable to read frames from camera" << std::endl;
+      break;
+    }
+        
+    // Record start time
+    auto start_time = std::chrono::high_resolution_clock::now();
+        
+    // Perform detection
+    cv::Mat result = detect(frame);
+        
+    // Record end time
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    // Compute the cost time of each detection
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+        
+    total_time += duration;
+    ++ frame_count;
+        
+    // Compute average FPS
+    double avg_fps = frame_count / (total_time / 1000.0);
+        
+    // Show FPS on image
+    std::string fps_text = cv::format("FPS: %.2f", avg_fps);
+    cv::putText(result, fps_text, cv::Point(20, 40), cv::FONT_HERSHEY_SIMPLEX, 0.75, ORANGE, 2);
+        
+    // Write detection to video file 
+    if (video_writer.isOpened()) 
+    {
+      video_writer.write(result);
+    }
+        
+    // Show preview
+    cv::imshow("Camera Detection", result);
+        
+    // Press ESC to quit
+    if (cv::waitKey(1) == 27) 
+    {
+      std::cout << "User interrupt process" << std::endl;
+      break;
+    }
+  }
+
+  cap.release();
+  if (video_writer.isOpened()) 
+  {
+    video_writer.release();
+  }
+  
+  cv::destroyAllWindows();
+    
+  std::cout << "Camera detection is completed, a total of " << frame_count << " frames" << std::endl;
+  std::cout << "Average FPS: " << (frame_count / (total_time / 1000.0)) << std::endl;
+    
+  if (!output_path.empty()) 
+  {
+    std::cout << "Results saved to " << output_path << std::endl;
+  }
     
   return frame_count;
 }

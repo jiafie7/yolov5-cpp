@@ -10,13 +10,16 @@ void printUsage(const std::string& program_name)
   std::cout << "  --image <image_path>                  Process a single image" << std::endl;
   std::cout << "  --batch <input_dir> <output_dir>      Batch process images in a directory" << std::endl;
   std::cout << "  --video <video_path> <output_path>    Process a video file" << std::endl;
+  std::cout << "  --camera <camera_id> <output_path>    Camera real-time detect (default ID: 0)" << std::endl;
 
   std::cout << std::endl;
 
   std::cout << "Example:" << std::endl;
   std::cout << "  " << program_name << " --image ../sample.jpg" << std::endl;
   std::cout << "  " << program_name << " --batch ../data ../results" << std::endl;
-  std::cout << "  " << program_name << " --video ../video.mp4 ../output.mp4" << std::endl;
+  std::cout << "  " << program_name << " --video ../video.mp4 ../xxx.mp4" << std::endl;
+  std::cout << "  " << program_name << " --camera" << std::endl;
+  std::cout << "  " << program_name << " --camera ../xxx.mp4" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -75,6 +78,29 @@ int main(int argc, char* argv[])
             
       detector.detectVideo(video_path, output_path);  
     }
+    else if (mode == "--camera") 
+    {
+      // Camera mode
+      int camera_id = 0;
+            
+      if (argc > 2) 
+      {
+        std::string output_path = argv[2];
+        detector.detectCamera(camera_id, output_path);
+      }
+      else
+      {
+        detector.detectCamera(camera_id);
+      }
+    } 
+    else 
+    {
+      // Mode error
+      std::cerr << "Invalid mode or arguments not enough" << std::endl;
+      printUsage(argv[0]);
+      return 1;
+    }
+
     return 0;
   }
   catch (const std::exception& e)

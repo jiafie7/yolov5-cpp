@@ -35,6 +35,9 @@ namespace detector
     // Process video files
     int detectVideo(const std::string& video_path, const std::string& output_path, bool show_preview = true);
 
+    // Real-time camera detection
+    int detectCamera(int camera_id = 0, const std::string& output_path = "../camera_recording.mp4");
+
   private:
     
     // Load category names from file
