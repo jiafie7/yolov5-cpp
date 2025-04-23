@@ -17,7 +17,8 @@ namespace detector
       float confidence_threshold = 0.45,
       float score_threshold = 0.5,
       float nms_threshold = 0.45
-    )
+    );
+
     virtual ~YOLODetector() = default;
 
     double getInferenceTime() const;
@@ -41,7 +42,7 @@ namespace detector
     // Draw labels on the image
     void drawLabel(cv::Mat& input_image, const std::string& label, int left, int top);
 
-  priavte:
+  private:
     // model parameters
     float m_input_width;
     float m_input_height;
@@ -59,7 +60,7 @@ namespace detector
     double m_inference_time;
 
     // font setup
-    const float FONT_SCALE = 0.75;
+    const float FONT_SCALE = 0.72;
     const int FONT_FACE = cv::FONT_HERSHEY_SIMPLEX;
     const int THICKNESS = 2;
 

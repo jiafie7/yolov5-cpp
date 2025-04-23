@@ -11,6 +11,8 @@ find_package(OpenCV REQUIRED)
 
 include_directories(./ ${OpenCV_INCLUDE_DIRS})
 
-add_executable(main main.cpp)
+file(GLOB_RECURSE SOURCES "detector/*.cpp")
+
+add_executable(main ${SOURCES} main.cpp)
 
 target_link_libraries(main ${OpenCV_LIBS})
