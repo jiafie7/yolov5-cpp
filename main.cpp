@@ -7,14 +7,16 @@ using namespace detector;
 void printUsage(const std::string& program_name)
 {
   std::cout << "Available modes:" << std::endl;
-  std::cout << "  --image <image_path>                  Processing a single image" << std::endl;
+  std::cout << "  --image <image_path>                  Process a single image" << std::endl;
   std::cout << "  --batch <input_dir> <output_dir>      Batch process images in a directory" << std::endl;
+  std::cout << "  --video <video_path> <output_path>    Process a video file" << std::endl;
 
   std::cout << std::endl;
 
   std::cout << "Example:" << std::endl;
   std::cout << "  " << program_name << " --image ../sample.jpg" << std::endl;
   std::cout << "  " << program_name << " --batch ../data ../results" << std::endl;
+  std::cout << "  " << program_name << " --video ../video.mp4 ../output.mp4" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -64,6 +66,14 @@ int main(int argc, char* argv[])
       std::string output_dir = argv[3];
             
       int processed = detector.detectBatch(input_dir, output_dir);   
+    }
+    else if (mode == "--video" && argc > 3) 
+    {
+      // Video process mode
+      std::string video_path = argv[2];
+      std::string output_path = argv[3];
+            
+      detector.detectVideo(video_path, output_path);  
     }
     return 0;
   }

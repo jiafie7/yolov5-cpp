@@ -32,6 +32,9 @@ namespace detector
     int detectBatch(const std::string& input_dir, const std::string& output_dir, bool show_progress = true);
     int detectBatch(const std::vector<std::string>& image_paths, const std::string& output_dir, bool show_progress = true);
 
+    // Process video files
+    int detectVideo(const std::string& video_path, const std::string& output_path, bool show_preview = true);
+
   private:
     
     // Load category names from file

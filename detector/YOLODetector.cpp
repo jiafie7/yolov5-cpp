@@ -303,3 +303,80 @@ int YOLODetector::detectBatch(const std::vector<std::string>& image_paths, const
   return processed_count;
 }
 
+int YOLODetector::detectVideo(const std::string& video_path, const std::string& output_path, bool show_preview)
+{
+  // Open video file
+  cv::VideoCapture cap(video_path);
+  if (!cap.isOpened()) 
+  {
+    throw std::runtime_error("Unable open video file: " + video_path);
+  }
+
+  // Get video attributes
+  int frame_width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+  int frame_height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+  double fps = cap.get(cv::CAP_PROP_FPS);
+  int total_frames = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_COUNT));
+
+  // Create video writer
+  cv::VideoWriter video_writer(
+    output_path,
+    cv::VideoWriter::fourcc('M', 'P', '4', 'V'),
+    fps,
+    cv::Size(frame_width, frame_height)
+  );
+
+  if (!video_writer.isOpened()) 
+  {
+    throw std::runtime_error("Unable create output video file: " + output_path);
+  }
+
+  cv::Mat frame;
+  int frame_count = 0;
+    
+  std::cout << "Start process video: " << video_path << std::endl;
+  std::cout << "Resolution: " << frame_width << "x" << frame_height << ", FPS: " << fps << ", Total frames: " << total_frames << std::endl;
+
+  // Process each frame
+  while (cap.read(frame)) 
+  {
+    // Detect current frame
+    cv::Mat result = detect(frame);
+        
+    // Write detection result to output video
+    video_writer.write(result);
+        
+    ++ frame_count;
+        
+    // Show process progress
+    if (frame_count % 10 == 0 || frame_count == total_frames) 
+    {
+      std::cout << "Process progress: " << frame_count << "/" << total_frames << " (" << static_cast<int>(100.0 * frame_count / total_frames) << "%)" << std::endl;
+    }
+
+    if (show_preview) 
+    {
+      cv::imshow("Video Processing", result);
+            
+      // Press ESC to quit
+      if (cv::waitKey(1) == 27) 
+      {
+        std::cout << "User interrupt processing" << std::endl;
+        break;
+      }
+    }
+  }
+
+  // Release resources
+  cap.release();
+  video_writer.release();
+    
+  if (show_preview) 
+  {    
+    cv::destroyAllWindows();
+  }
+    
+  std::cout << "Video processing completed, processed " << frame_count << " frames，results saved to " << output_path << std::endl;
+    
+  return frame_count;
+}
