@@ -47,7 +47,7 @@ namespace detector
     void drawLabel(cv::Mat& input_image, const std::string& label, int left, int top);
 
     // Get all image files in a directory
-    std::vector<std::string> getImageFiles(const std::string& directory)
+    std::vector<std::string> getImageFiles(const std::string& directory);
 
   private:
     // model parameters

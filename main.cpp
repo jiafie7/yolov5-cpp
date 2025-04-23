@@ -7,11 +7,14 @@ using namespace detector;
 void printUsage(const std::string& program_name)
 {
   std::cout << "Available modes:" << std::endl;
-  std::cout << "  --image <image_path>               Processing a single image" << std::endl;
+  std::cout << "  --image <image_path>                  Processing a single image" << std::endl;
+  std::cout << "  --batch <input_dir> <output_dir>      Batch process images in a directory" << std::endl;
 
   std::cout << std::endl;
+
   std::cout << "Example:" << std::endl;
   std::cout << "  " << program_name << " --image ../sample.jpg" << std::endl;
+  std::cout << "  " << program_name << " --batch ../data ../results" << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -53,6 +56,14 @@ int main(int argc, char* argv[])
       std::string output_path = image_path.substr(0, image_path.find_last_of('.')) + "_detected.jpg";
       cv::imwrite(output_path, result);
       std::cout << "Results saved to: " << output_path << std::endl;
+    }
+    else if (mode == "--batch" && argc > 3) 
+    {
+      // Batch process mode
+      std::string input_dir = argv[2];
+      std::string output_dir = argv[3];
+            
+      int processed = detector.detectBatch(input_dir, output_dir);   
     }
     return 0;
   }
