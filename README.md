@@ -2,4 +2,6 @@
 
 Object Detection using YOLOv5 and C++
 
-![Detection Result](./sample_detected.jpg)
+![Image Detection](./sample_detected.jpg)
+
+![Video Detection](./sample_detected.gif)
